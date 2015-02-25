@@ -15,7 +15,12 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Set product price based on user role.
 
 == Description ==
-Set product price based on user role.
+This plugin extends the popular ecommerce Plugin <a href="http://www.woothemes.com/woocommerce/">Woocommerce</a> so that products can be offered at different prices for different customer groups.
+
+For example, Subscribers or Contributers get different prices than new customers. Differentiate your registered users to get your shop more attraktiv. New roles can be created and managed.
+
+<h3> Where i can set the product price </h3>
+When you edit / create a product you can see a link "Role Based Price" under product data meta box.
 
 == Screenshots ==
 1. WC Role Based Price
