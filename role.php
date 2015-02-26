@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Role Based Product Price
  * Plugin URI: http://www.woothemes.com/woocommerce/
  * Description: Product Price Based On User Role
- * Version: 0.1
+ * Version: 0.2
  * Author: varunms
  * Author URI: http://woothemes.com
  * License:           GPL-2.0+
@@ -21,6 +21,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class role_based_price{
     
+	/**
+     * Load The Class
+     * @since 0.1
+	 */
 	public function init(){
 		add_filter('woocommerce_product_data_tabs',array($this,'role_based_price_link'));
 		add_action('woocommerce_product_data_panels',array($this,'role_based_price_form'));
@@ -28,23 +32,42 @@ class role_based_price{
         add_action('woocommerce_init',array($this,'wc_init'));
 	}
     
+    /**
+     * Load Other Works After WooCommerce Loaded
+     * @since 0.1
+     */
     public function wc_init(){
         add_filter('woocommerce_get_sale_price',array($this,'role_based_sale_price'),1,2);
 		add_filter('woocommerce_get_regular_price',array($this,'role_based_regular_price'),1,2);
 		add_filter('woocommerce_get_price',array($this,'role_based_price_all'),1,2);
-
     }
+    
+	/**
+	 * Adds Menu Link In Product Edit
+	 * @since 0.1
+	 * @filter_use woocommerce_product_data_tabs
+	 */
 	public function role_based_price_link($array){
-		$array['role_price'] = array('label' => 'Role Based Price' , 'target' => 'role_based_price_container','class'=>array());
+		$array['role_price'] = array('label' => 'Role Based Price' , 'target' => 'role_based_price_container','class'=>array('hide_if_virtual'));
 		return $array;
-	}
+	} 
 	
+	/**
+	 * Get's Registered User Roles
+	 * @return Array
+	 * @since 0.1
+	 */
 	private function get_roles(){
 		$user_roles = get_editable_roles();
 		return $user_roles;
 	}
+    
+	/**
+	 * Adds Form In WC Product Edit Page
+	 * @since 0.1
+	 * @filter_use woocommerce_product_data_panels
+	 */
 	public function role_based_price_form(){
-		
 		echo '<div class="panel woocommerce_options_panel" id="role_based_price_container" style="display: none;">';
 		foreach($this->get_roles() as $key => $val){
             if($key == 'administrator'){continue;}
@@ -69,6 +92,11 @@ class role_based_price{
 		echo '</div>';
 	}
 	
+	/**
+	 * Saves Product Data In DB
+	 * @since 0.1
+	 * @filter_use woocommerce_process_product_meta_simple
+	 */
 	public function save_role_based_price($post_id){ 
 		$prices = $_POST['role_based_price'];
 		foreach($prices as $key => $val){
@@ -77,6 +105,10 @@ class role_based_price{
 		} 
 	}
 	
+	/**
+	 * Get Current Logged In User Role
+	 * @since 0.1
+	 */
 	public function get_current_role(){
 		global $current_user;
 		$user_roles = $current_user->roles;
@@ -84,39 +116,58 @@ class role_based_price{
 		return $user_role;
 	}
 	
+	/**
+	 * Gets Role Based Sale Price
+	 * @since 0.1
+	 * @filter_use woocommerce_get_sale_price
+	 */
 	public function role_based_sale_price($price,$product){
 		$post_id = $product->id;
 		$role = $this->get_current_role();  
 		$price_new = get_post_meta($post_id,'_selling_price_'.$role);
-        if(!empty($price_new)){return floatval($price_new[0]);}
+        if(!empty($price_new)){
+            $product->sale_price = $price_new[0];
+            return floatval($price_new[0]);
+        }
         return $price;
-		
 	}
+    
+	/**
+	 * Gets Role Based Regular Price
+	 * @since 0.1
+	 * @filter_use woocommerce_get_regular_price
+	 */
 	public function role_based_regular_price($price,$product){
 		$post_id = $product->id;
 		$role = $this->get_current_role();  
 		$price_new = get_post_meta($post_id,'_regular_price_'.$role);
-        if(!empty($price_new)){return floatval($price_new[0]);}
+        if(!empty($price_new)){
+            $product->regular_price = $price_new[0];
+            return floatval($price_new[0]);
+        }
         return $price;
 	}
     
+    /**
+     * Gets Product Actual Price Based On User Role
+     * @since 0.1
+     * @updated 0.2
+     * @filter_use woocommerce_get_price
+     */
     public function role_based_price_all($price,$product){
-        $sale_price = $this->role_based_sale_price('',$product);
-        $regular_price = $this->role_based_regular_price('',$product);
-        
-        if(!empty($sale_price) &&  !empty($regular_price)){
-            if($sale_price > $regular_price){
-                return $sale_price;
-            } else {
-                return $regular_price;
-            }
-        } else if(! empty($regular_price)){
-            return $regular_price;
-        } else if(! empty($sale_price)){
-            return $sale_price;
-        } else {
-            return $price;
+        $sale_price = $this->role_based_sale_price($price,$product);
+        $regular_price = $this->role_based_regular_price($price,$product);
+        $return_price = '';
+
+        if($sale_price < $regular_price){
+            $return_price = $sale_price;
+        } else if(empty($sale_price) && ! empty($regular_price)){
+            $return_price = $regular_price;
         }
+        if(!empty($return_price)){
+            return $return_price;
+        } 
+        return $price;
         
     }
 }
