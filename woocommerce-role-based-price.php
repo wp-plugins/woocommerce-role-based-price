@@ -6,7 +6,7 @@
  * Version:           1.1
  * Author:            Varun Sridharan
  * Author URI:        http://varunsridharan.in
- * Text Domain:       wc-rbp
+ * Text Domain:       woocommerce-role-based-price
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt 
  * GitHub Plugin URI: @TODO
@@ -21,8 +21,7 @@ define('WC_RBP_ADMIN_CSS',WC_RBP_PATH.'admini/css/'); # Plugin DIR
 define('WC_RBP_ADMIN_JS',WC_RBP_PATH.'admini/js/'); # Plugin DIR
 define('rbp_key','wc_rbp_'); # PLugin DB Prefix
 define('WC_DB_KEY',rbp_key); # Plugin Prefix
-define('lang_dom','wc-rbp',true); #plugin lang Domain
-
+define('lang_dom','woocommerce-role-based-price',true); #plugin lang Domain
 
 /**
  * Class to initiate the plugin
@@ -48,7 +47,6 @@ final class  WooCommerce_Role_Based_Price{
      */
     private function __construct() {
         add_action( 'init', array( $this, 'init' ), 0 );
-        add_action('plugins_loaded', array( $this, 'langs' ));
         
         // Autoload Required Files
         foreach( glob(WC_RBP_PATH . 'includes/*.php' ) as $files ){
@@ -86,6 +84,9 @@ final class  WooCommerce_Role_Based_Price{
      * Runs After WP Loaded
      */
     public function init(){
+        add_action('plugins_loaded', array( $this, 'langs' ));
+        add_filter('load_textdomain_mofile',  array( $this, 'replace_my_plugin_default_language_files' ), 10, 2);
+        
         if($this->is_request( 'admin' )){
             $this->admin_init();
         } 
@@ -93,7 +94,14 @@ final class  WooCommerce_Role_Based_Price{
     }
     
     public function langs(){
-        load_plugin_textdomain( 'wc-rbp', false, WC_RBP_PATH . '/lang/' );
+        load_plugin_textdomain(lang_dom, false, dirname(plugin_basename(__FILE__)).'/lang/' );
+    }
+    
+    function replace_my_plugin_default_language_files($mofile, $domain) {
+        if (lang_dom === $domain)
+            return WC_RBP_PATH.'lang/'.get_locale().'.mo';
+
+        return $mofile;
     }
     
     /**

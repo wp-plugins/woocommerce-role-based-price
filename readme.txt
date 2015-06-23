@@ -19,8 +19,12 @@ This plugin extends the popular ecommerce Plugin <a href="http://www.woothemes.c
 
 For example, Subscribers or Contributers get different prices than new customers. Differentiate your registered users to get your shop more attraktiv. New roles can be created and managed.
 
-<h3> Where i can set the product price </h3>
-When you edit / create a product you can see a link "Role Based Price" under product data meta box.
+<h3>How I Can Get Support For This Plugin</h3>
+* http://varunsridharan.in/plugin-support/
+* https://wordpress.org/support/plugin/woocommerce-role-based-price
+* https://github.com/technofreaky/WooCommerce-Role-Based-Price
+* Email : varunsridharan23@gmail.com
+* Email : plugin@varunsridharan.in
 
 = Plugin Contributers =
 * <a href="https://wordpress.org/support/profile/nick6352683" >nick6352683 </a>
