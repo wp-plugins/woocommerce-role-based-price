@@ -85,6 +85,8 @@ Please open an issue at <a href="https://github.com/technofreaky/WooCommerce-Rol
 
 
 == Changelog ==
+= 1.3 =
+* Major Update [Had Some File Conflict.. please update your plugin too]
 = 1.2 =
 * Fixed Error Message at product price when viewing as visitor 
 
